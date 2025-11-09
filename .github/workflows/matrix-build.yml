@@ -1,0 +1,98 @@
+name: Multi-Platform Matrix Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  matrix-build:
+    name: Build on ${{ matrix.os }} - Node ${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [16, 18, 20]
+        include:
+          - os: ubuntu-latest
+            os-name: linux
+          - os: windows-latest
+            os-name: windows
+          - os: macos-latest
+            os-name: macos
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: matrix-03cb8e7
+        run: |
+          echo "Building for ${{ matrix.os }} with Node ${{ matrix.node-version }}"
+          echo "Matrix identifier: matrix-03cb8e7"
+      
+      - name: Generate build info
+        run: |
+          echo "Build Information" > build-info.txt
+          echo "==================" >> build-info.txt
+          echo "OS: ${{ matrix.os }}" >> build-info.txt
+          echo "Node Version: ${{ matrix.node-version }}" >> build-info.txt
+          echo "Build Time: $(date)" >> build-info.txt
+          echo "Runner: ${{ runner.os }}" >> build-info.txt
+          echo "Architecture: ${{ runner.arch }}" >> build-info.txt
+        shell: bash
+      
+      - name: Create build artifact
+        run: |
+          mkdir -p build
+          echo "{" > build/output.json
+          echo "  \"platform\": \"${{ matrix.os-name }}\"," >> build/output.json
+          echo "  \"nodeVersion\": \"${{ matrix.node-version }}\"," >> build/output.json
+          echo "  \"buildId\": \"${{ github.run_id }}\"," >> build/output.json
+          echo "  \"buildNumber\": \"${{ github.run_number }}\"," >> build/output.json
+          echo "  \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"," >> build/output.json
+          echo "  \"status\": \"success\"" >> build/output.json
+          echo "}" >> build/output.json
+          cp build-info.txt build/
+        shell: bash
+      
+      - name: Display artifact contents
+        run: |
+          echo "=== Build Info ==="
+          cat build/build-info.txt
+          echo ""
+          echo "=== Output JSON ==="
+          cat build/output.json
+        shell: bash
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-03cb8e7-${{ matrix.os-name }}-node${{ matrix.node-version }}
+          path: build/
+          retention-days: 7
+
+  summary:
+    name: Build Summary
+    needs: matrix-build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Summary
+        run: |
+          echo "### Matrix Build Complete! ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All matrix variants have been built successfully:" >> $GITHUB_STEP_SUMMARY
+          echo "- 3 Operating Systems (Linux, Windows, macOS)" >> $GITHUB_STEP_SUMMARY
+          echo "- 3 Node.js Versions (16, 18, 20)" >> $GITHUB_STEP_SUMMARY
+          echo "- Total: 9 parallel build jobs" >> $GITHUB_STEP_SUMMARY
+          echo "- Total: 9 artifacts uploaded" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Artifacts are named with prefix: \`build-03cb8e7-\`" >> $GITHUB_STEP_SUMMARY
