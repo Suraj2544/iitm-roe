@@ -4,9 +4,7 @@ This repository demonstrates a modern CI/CD pipeline using GitHub Actions matrix
 
 ## 📧 Contact Information
 
-**Email:** surajmishra4844@gmail.com
-
-*(Please replace with your actual email address)*
+**Email:** 21f3000813@ds.study.iitm.ac.in
 
 ## 🚀 Features
 
