@@ -4,7 +4,7 @@ This repository demonstrates a modern CI/CD pipeline using GitHub Actions matrix
 
 ## 📧 Contact Information
 
-**Email:** your.email@example.com
+**Email:** surajmishra4844@gmail.com
 
 *(Please replace with your actual email address)*
 
